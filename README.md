@@ -1,11 +1,10 @@
 DIVE (Dennis Instant eValuation)
 ======
 
-
 Building 
 ======
-No installation is required. To build, you need 
-Java 6 or higher and [Maven 2](http://maven.apache.org/) or higher. 
+No installation is required. To build, you need Java 7 or higher and 
+[Maven 2](http://maven.apache.org/) or higher. 
 
 Before cloning this repository, be sure to enable automatic conversion 
 of CRLF/LF on your machine using ```git config --global core.autocrlf input```. 

@@ -1,24 +1,22 @@
 #!/bin/bash
 
-if [ ! -d target ] || [ ! -f classpath.txt ]
+if [ ! -d target ] || [ ! -f dive-classpath.txt ]
 then
 	mvn clean package
-	mvn dependency:build-classpath -Dmdep.outputFile=classpath.txt
+	mvn dependency:build-classpath -Dmdep.outputFile=dive-classpath.txt
 fi
 
-RWS_CP=target/classes:`cat classpath.txt`
-RWS_HOSTNAME=`hostname -f`
+DIVE_CLASSPATH=target/classes:`cat dive-classpath.txt`
 
 nohup java \
     -Djava.endorsed.dirs=target/endorsed \
     -Djava.net.preferIPv4Stack=true \
     -Xmx1024m \
-    -cp $RWS_CP \
-    eu.wisebed.restws.WisebedRestServer \
-    --hostname $RWS_HOSTNAME \
+    -cp $DIVE_CLASSPATH \
+    de.farberg.dive.Main \
+    --database database \
     --logLevel DEBUG \
     --port 8080 \
-    --testbedMap testbedMap.json \
     2>&1 >> /dev/null &
     
-echo $! >> rest-ws.pid
+echo $! >> dive.pid
