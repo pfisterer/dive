@@ -55,6 +55,8 @@ public class Evaluation {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Evaluation [id=");
 		builder.append(id);
+		builder.append(", lecture=");
+		builder.append(lecture);
 		builder.append(", creationTime=");
 		builder.append(creationTime);
 		builder.append(", encryptedContent=");
@@ -63,4 +65,5 @@ public class Evaluation {
 		return builder.toString();
 	}
 
+	
 }

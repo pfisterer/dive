@@ -16,7 +16,7 @@ nohup java \
     de.farberg.dive.Main \
     --database database \
     --logLevel DEBUG \
-    --port 8080 \
+    --port 8886 \
     2>&1 >> /dev/null &
     
 echo $! >> dive.pid

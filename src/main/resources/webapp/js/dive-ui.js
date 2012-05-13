@@ -22,6 +22,26 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+function valueToGradeText(value) {
+	if( value == 1) { return "Sehr gut (very good, 1)"; }
+	else if( value == 2) { return "Gut (good, 2)"; }
+	else if( value == 3) { return "Befriedigend (satisfactory, 3)"; }
+	else if( value == 4) { return "Ausreichend (sufficient, 4)"; }
+	else if( value == 5) { return "Mangelhaft (poor, 5)"; }
+	else if( value == 6) { return "Mangelhaft (deficient, 6)"; }
+	else return "No selection";
+}
+
+function isJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+
 var DiveGui = new function() {
 	var self = this;
 	
@@ -71,9 +91,9 @@ var DiveGui = new function() {
 	
 
 /**
- * ---------------------------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------------------------
  * Evaluation Dialog
- * ---------------------------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------------------------
  */
 var DiveGuiDialog = function(module) {
 
@@ -86,20 +106,26 @@ var DiveGuiDialog = function(module) {
 
 	this.okButton = null;
 	this.cancelButton = null;
-	this.formData = null;
-
+	
+	this.formData =	{
+			version 			: 0,
+			key 				: "",
+			good 				: "",
+			bad 				: "",
+			contentsGrade 		: 0,
+			presentationGrade 	: 0,
+	}; 
+		
 	var self = this;
 	self.buildView(module);
 };
 
 
 DiveGuiDialog.prototype.updateLoginDataFromForm = function() {
-	this.formData = {
-			key 	: $("#auth-"+this.dialogId)[0].value,
-			good 	: $("#good-"+this.dialogId)[0].value,
-			bad 	: $("#bad-"+this.dialogId)[0].value,
-	};
-	
+	this.formData.version 	= 1;
+	this.formData.key 		= $("#auth-"+this.dialogId)[0].value;
+	this.formData.good 		= $("#good-"+this.dialogId)[0].value;
+	this.formData.bad 		= $("#bad-"+this.dialogId)[0].value;
 };
 
 DiveGuiDialog.prototype.submit = function() {
@@ -178,6 +204,14 @@ DiveGuiDialog.prototype.buildView = function(module) {
 			+ '		<table>'
 			+ '		<tbody>'
 			
+			+ '			<tr>'
+			+ '				<td>'
+			+ '					<div class="contentsSlider"></div>'
+			+ '				</td>'
+			+ '				<td width="50%">'
+			+ '					<div class="contentsSliderText">' +valueToGradeText(0)+ '</div>'
+			+ '				</td>'
+			+ '			</tr>'
 			
 			+ '		</tbody>'
 			+ '		</table>'
@@ -188,6 +222,14 @@ DiveGuiDialog.prototype.buildView = function(module) {
 			+ '		<table>'
 			+ '		<tbody>'
 			
+			+ '			<tr>'
+			+ '				<td>'
+			+ '					<div class="presentationSlider"></div>'
+			+ '				</td>'
+			+ '				<td width="50%">'
+			+ '					<div class="presentationSliderText">' +valueToGradeText(0)+ '</div>'
+			+ '				</td>'
+			+ '			</tr>'
 			
 			+ '		</tbody>'
 			+ '		</table>'
@@ -228,6 +270,36 @@ DiveGuiDialog.prototype.buildView = function(module) {
 			+ '	</div>');
 
 
+			var contentsSliderDiv 	= $(dialogBody.find('div.contentsSlider').first()[0]);
+			var contentsSliderText	= $(dialogBody.find('div.contentsSliderText').first()[0]);
+			contentsSliderDiv.slider(
+					{	value: 0, 
+						min: 0, 
+						max: 6, 
+						step: 1, 
+						slide: function( event, ui ) {
+							contentsSliderText.empty();
+							contentsSliderText.append(valueToGradeText(ui.value));
+							that.formData.contentsGrade = ui.value;
+						}
+					}
+				);
+			
+			var presentationSliderDiv 	= $(dialogBody.find('div.presentationSlider').first()[0]);
+			var presentationSliderText	= $(dialogBody.find('div.presentationSliderText').first()[0]);
+			presentationSliderDiv.slider(
+					{	value: 0, 
+						min: 0, 
+						max: 6, 
+						step: 1, 
+						slide: function( event, ui ) {
+							presentationSliderText.empty();
+							presentationSliderText.append(valueToGradeText(ui.value));
+							that.formData.presentationGrade = ui.value;
+						}
+					}
+				);
+	
 	this.okButton = $('<input class="btn primary" value="OK" style="width:25px;text-align:center;">');
 	this.cancelButton = $('<input class="btn secondary" value="Cancel" style="width:45px;text-align:center;">');
 
@@ -254,9 +326,9 @@ DiveGuiDialog.prototype.buildView = function(module) {
 
 
 /**
- * ---------------------------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------------------------
  * Create module Admin Dialog
- * ---------------------------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------------------------
  */
 
 
@@ -372,9 +444,9 @@ DiveGuiCreateModuleDialog.prototype.buildView = function() {
 
 
 /**
- * ---------------------------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------------------------
  * View module Admin Dialog
- * ---------------------------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------------------------
  */
 
 
@@ -430,11 +502,15 @@ DiveGuiViewModuleDialog.prototype.buildView = function() {
 			+ '		</table>'
 			
 			+ '		</form>'
+			
+			+ '		<div class="evaluationDiv"></div>'
+			
 			+ '	</div>');
 
-	var adminKeyInput = dialogBody.find('input.adminKeyInput').first();
-	var userKeyInput = dialogBody.find('input.userKeyInput').first();
-	var loadButton = dialogBody.find('input.loadButton').first();
+	var adminKeyInput 	= dialogBody.find('input.adminKeyInput').first();
+	var userKeyInput 	= dialogBody.find('input.userKeyInput').first();
+	var loadButton 		= dialogBody.find('input.loadButton').first();
+	var evaluationDiv	= dialogBody.find('div.evaluationDiv').first();
 
 	var self = this;
 	loadButton.bind('click', this, function(e) {
@@ -449,15 +525,15 @@ DiveGuiViewModuleDialog.prototype.buildView = function() {
 			if (jqXHR.status == 403) { 
 				alert("Key not valid."); 
 			} else if (jqXHR.status == 404) { 
-					alert("Module not found."); 
+				alert("Module not found."); 
 			} else {  
 				console.log(jqXHR); 
 				DiveGui.showAjaxError(jqXHR, textStatus, errorThrown); 
 			} 
 		};
  
-		var callbackDone = function(data) { 
-			alert(data); //TODO: Hier gehts weiter!
+		var callbackDone = function(evaluations) { 
+			self.displayEvaluations($(evaluationDiv[0]), evaluations.evaluations, userKeyInput[0].value);
 		};
  
 		Dive.getEvaluation(request, callbackDone, callbackError);
@@ -476,6 +552,53 @@ DiveGuiViewModuleDialog.prototype.buildView = function() {
 
 
 
+DiveGuiViewModuleDialog.prototype.displayEvaluations = function(div, evaluations, userKey) {
+	var table = 
+		$('<table>'
+			+ '	<thead>'
+			+ '		<tr>'
+			+ '			<td>Lecture</td>'
+			+ '			<td>Contents</td>'
+			+ '			<td>Presentation</td>'
+			+ '			<td>Good</td>'
+			+ '			<td>Bad</td>'
+			+ '		</tr>'
+			+ '	<thead>'
+			+ '<tbody>' 
+			+ '</tbody>' 
+			+ '</table>');
+
+	div.empty();
+	div.append(table);
+	
+	var tbody = $(table.find('tbody').first()[0]);
+	
+	for (var i = 0; i < evaluations.length; i++) {
+		var evaluation = evaluations[i];
+		var decrypted = CryptoJS.AES.decrypt(evaluation.encryptedContent, userKey).toString(CryptoJS.enc.Utf8);
+		
+		var row = $('	<tr colspan="5">Unable to decrypt</tr>');
+		
+		if(isJsonString(decrypted)) {
+			
+			var data = eval('(' + decrypted + ')');
+			
+			row = $('	<tr>'
+
+					+ '		<td>' + evaluation.lecture + '</td>'
+					+ '		<td>' + (data.contentsGrade ? data.contentsGrade : "") + '</td>'
+					+ '		<td>' + (data.presentationGrade ? data.presentationGrade : "") + '</td>'
+					+ '		<td>' + (data.good ? data.good : "") + '</td>'
+					+ '		<td>' + (data.bad ?data.bad : "") + '</td>'
+					
+					+ '	</tr>');
+			
+		}
+		
+		tbody.append(row);
+	}
+	
+};
 
 
 
@@ -503,14 +626,13 @@ DiveGuiViewModuleDialog.prototype.buildView = function() {
  * #################################################################
  * DiveGuiNotificationsViewer
  * #################################################################
- *
+ * 
  * Consumes events of type 'diveui-notification' and displays them in a
  * notification area. A 'diveui-notification' event has to carry data of the
- * following type:
- *  { type : "alert"|"block-alert" severity : "warning"|"error"|"success"|"info"
- * message : "Oh snap! Change this and that and try again." actions : an array
- * of buttons (only for block-alerts) }
- *
+ * following type: { type : "alert"|"block-alert" severity :
+ * "warning"|"error"|"success"|"info" message : "Oh snap! Change this and that
+ * and try again." actions : an array of buttons (only for block-alerts) }
+ * 
  */
 
 var WiseGuiNotificationsViewer = function() {
