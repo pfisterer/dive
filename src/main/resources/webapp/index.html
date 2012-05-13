@@ -37,6 +37,7 @@
 	<script type="text/javascript" src="js/library/jquery-1.7.1.js"></script>
 	<script type="text/javascript" src="js/library/jquery.ba-bbq.min.js"></script>
 	<script type="text/javascript" src="js/library/jquery.cookie.js"></script>
+	<script type="text/javascript" src="js/library/jquery.url.js"></script>
 	<script type="text/javascript" src="js/library/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="js/library/jquery.dateformat-1.0.js"></script>
 	<script type="text/javascript" src="js/library/jquery.timePicker.js"></script>
@@ -66,8 +67,8 @@
 $(function () {
 
 	var module = {
-			name	: "1",
-			lecture	: "Integrity"
+			name	: $.url().param('name'),
+			lecture	: $.url().param('lecture')
 	};
 	
 	var diveGuiDialog = new DiveGuiDialog(module);

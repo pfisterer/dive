@@ -248,7 +248,7 @@ DiveGuiDialog.prototype.buildView = function(module) {
 			+ '						Good things'
 			+ '				</td>'
 			+ '				<td>'
-			+ '						<textarea class="input-xlarge goodthings" id="good-'+that.dialogId+'" rows="2" placeholder="Please enter anything that you liked about this spmodule"></textarea>'
+			+ '						<textarea class="input-xlarge goodthings" id="good-'+that.dialogId+'" rows="2" placeholder="Please enter anything that you liked."></textarea>'
 			+ '				</td>'
 			+ '			</tr>'
 			
@@ -257,7 +257,7 @@ DiveGuiDialog.prototype.buildView = function(module) {
 			+ '						Criticism'
 			+ '				</td>'
 			+ '				<td>'
-			+ '						<textarea class="input-xlarge badthings" id="bad-'+that.dialogId+'" rows="2" placeholder="Please enter anything that you DID NOT like about this specific module"></textarea>'
+			+ '						<textarea class="input-xlarge badthings" id="bad-'+that.dialogId+'" rows="2" placeholder="Please enter anything that you DID NOT like."></textarea>'
 			+ '				</td>'
 			+ '			</tr>'
 			
