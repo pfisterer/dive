@@ -34,5 +34,5 @@ import de.farberg.dive.lectures.Evaluation;
 public class EvaluationsDto {
 	public String stringModuleName;
 
-	public List<Evaluation> evaluations = new LinkedList<>();
+	public List<Evaluation> evaluations = new LinkedList<Evaluation>();
 }

@@ -79,7 +79,7 @@ public class HibernateModules implements Modules {
 		e.encryptedContent = evaluation;
 
 		if (module.evaluations == null)
-			module.evaluations = new LinkedList<>();
+			module.evaluations = new LinkedList<Evaluation>();
 
 		module.evaluations.add(e);
 		

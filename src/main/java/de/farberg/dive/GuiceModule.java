@@ -107,7 +107,7 @@ public class GuiceModule extends AbstractModule {
 			log.debug("Using Hibernate property: {} = {}", keyString, value);
 		}
 
-		List<Class<? extends Object>> persistedClasses = new LinkedList<>();
+		List<Class<? extends Object>> persistedClasses = new LinkedList<Class<? extends Object>>();
 		persistedClasses.add(Module.class);
 		persistedClasses.add(Evaluation.class);
 
