@@ -23,14 +23,25 @@
  */
 
 function valueToGradeText(value) {
-	if( value == 1) { return "Sehr gut (very good, 1)"; }
-	else if( value == 2) { return "Gut (good, 2)"; }
-	else if( value == 3) { return "Befriedigend (satisfactory, 3)"; }
-	else if( value == 4) { return "Ausreichend (sufficient, 4)"; }
-	else if( value == 5) { return "Mangelhaft (poor, 5)"; }
-	else if( value == 6) { return "Mangelhaft (deficient, 6)"; }
-	else return "No selection";
+		 if( value == 1) 	return { color : "#32CD32", text : "Sehr gut (very good, 1)" }; 
+	else if( value == 2) 	return { color : "#32CD32", text : "Gut (good, 2)" }; 
+	else if( value == 3) 	return { color : "#006400", text : "Befriedigend (satisfactory, 3)" }; 
+	else if( value == 4) 	return { color : "#B8860B", text : "Ausreichend (sufficient, 4)" }; 
+	else if( value == 5) 	return { color : "#DC143C", text : "Mangelhaft (poor, 5)" }; 
+	else if( value == 6) 	return { color : "#B22222", text : "Ungenügend (deficient, 6)" }; 
+	else 					return { color : "#808080", text : "No selection" }; 
 }
+
+function valueToContentRating(value) {
+		 if( value == 1) 	return { color : "#32CD32", text : "Perfect Balance" };
+	else if( value == 2) 	return { color : "#B8860B", text : "Could've been a bit more" };
+	else if( value == 3) 	return { color : "#B8860B", text : "Could've been a bit less" };
+	else if( value == 4) 	return { color : "#DC143C", text : "Too few stuff for one lecture" };
+	else if( value == 5) 	return { color : "#DC143C", text : "Way too much" };
+	else 					return { color : "#808080", text : "No selection" };
+}
+
+
 
 function isJsonString(str) {
     try {
@@ -113,7 +124,7 @@ var DiveGuiDialog = function(module) {
 			good 				: "",
 			bad 				: "",
 			contentsGrade 		: 0,
-			presentationGrade 	: 0,
+			timeContentRatio 	: 0,
 	}; 
 		
 	var self = this;
@@ -209,7 +220,7 @@ DiveGuiDialog.prototype.buildView = function(module) {
 			+ '					<div class="contentsSlider"></div>'
 			+ '				</td>'
 			+ '				<td width="50%">'
-			+ '					<div class="contentsSliderText">' +valueToGradeText(0)+ '</div>'
+			+ '					<div class="contentsSliderText" style="font-weight:bold; color: "+ valueToGradeText(0).color +";">' + valueToGradeText(0).text+ '</div>'
 			+ '				</td>'
 			+ '			</tr>'
 			
@@ -217,17 +228,17 @@ DiveGuiDialog.prototype.buildView = function(module) {
 			+ '		</table>'
 			
 			/* ----------------------------------------------------------- */
-			+ '		<h4>Presentation</h4>'	
+			+ '		<h4>Time/Content Ratio</h4>'	
 			/* ----------------------------------------------------------- */
 			+ '		<table>'
 			+ '		<tbody>'
 			
 			+ '			<tr>'
 			+ '				<td>'
-			+ '					<div class="presentationSlider"></div>'
+			+ '					<div class="timeContentsRatio"></div>'
 			+ '				</td>'
 			+ '				<td width="50%">'
-			+ '					<div class="presentationSliderText">' +valueToGradeText(0)+ '</div>'
+			+ '					<div class="timeContentsRatioText" style="font-weight:bold; color: "+ valueToContentRating(0).color +";">' + valueToContentRating(0).text+ '</div>'
 			+ '				</td>'
 			+ '			</tr>'
 			
@@ -279,23 +290,25 @@ DiveGuiDialog.prototype.buildView = function(module) {
 						step: 1, 
 						slide: function( event, ui ) {
 							contentsSliderText.empty();
-							contentsSliderText.append(valueToGradeText(ui.value));
+							contentsSliderText.append(valueToGradeText(ui.value).text);
+							contentsSliderText.css("color", valueToGradeText(ui.value).color);
 							that.formData.contentsGrade = ui.value;
 						}
 					}
 				);
 			
-			var presentationSliderDiv 	= $(dialogBody.find('div.presentationSlider').first()[0]);
-			var presentationSliderText	= $(dialogBody.find('div.presentationSliderText').first()[0]);
-			presentationSliderDiv.slider(
+			var timeContentsRatioDiv 	= $(dialogBody.find('div.timeContentsRatio').first()[0]);
+			var timeContentsRatioText	= $(dialogBody.find('div.timeContentsRatioText').first()[0]);
+			timeContentsRatioDiv.slider(
 					{	value: 0, 
 						min: 0, 
-						max: 6, 
+						max: 5, 
 						step: 1, 
 						slide: function( event, ui ) {
-							presentationSliderText.empty();
-							presentationSliderText.append(valueToGradeText(ui.value));
-							that.formData.presentationGrade = ui.value;
+							timeContentsRatioText.empty();
+							timeContentsRatioText.append(valueToContentRating(ui.value).text);
+							timeContentsRatioText.css("color", valueToContentRating(ui.value).color);
+							that.formData.timeContentRatio = ui.value;
 						}
 					}
 				);
@@ -559,7 +572,7 @@ DiveGuiViewModuleDialog.prototype.displayEvaluations = function(div, evaluations
 			+ '		<tr>'
 			+ '			<td>Lecture</td>'
 			+ '			<td>Contents</td>'
-			+ '			<td>Presentation</td>'
+			+ '			<td>Time/Content Ratio</td>'
 			+ '			<td>Good</td>'
 			+ '			<td>Bad</td>'
 			+ '		</tr>'
@@ -587,7 +600,7 @@ DiveGuiViewModuleDialog.prototype.displayEvaluations = function(div, evaluations
 
 					+ '		<td>' + evaluation.lecture + '</td>'
 					+ '		<td>' + (data.contentsGrade ? data.contentsGrade : "") + '</td>'
-					+ '		<td>' + (data.presentationGrade ? data.presentationGrade : "") + '</td>'
+					+ '		<td>' + (data.timeContentRatio ? data.timeContentRatio : "") + '</td>'
 					+ '		<td>' + (data.good ? data.good : "") + '</td>'
 					+ '		<td>' + (data.bad ?data.bad : "") + '</td>'
 					
