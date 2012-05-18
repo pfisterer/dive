@@ -111,7 +111,8 @@ var DiveGuiDialog = function(module) {
 	this.module = module;
 	this.dialogId = CryptoJS.SHA1("DiveDialog" + this.module.name).toString();
 	
-	this.view = $('<div id="DiveGui'+ this.dialogId+'" class="modal hide"></div>');
+//	this.view = $('<div id="DiveGui'+ this.dialogId+'" class="modal hide"></div>');
+	this.view = $('<div id="DiveGui'+ this.dialogId+'" class=""></div>');
 	
 	$(document.body).append(this.view);
 
