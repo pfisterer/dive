@@ -29,6 +29,10 @@ if( typeof diveBaseUrl === 'undefined' )
 
 var Dive = new function() {
 	
+	this.escapeForHTML = function(inputText) {
+		return $('<div/>').text(inputText).html();
+	}
+	
 	this.createModule = function(module, callbackDone, callbackError) {
 
 		$.ajax({
