@@ -134,9 +134,9 @@ var DiveGuiDialog = function(module) {
 
 DiveGuiDialog.prototype.updateLoginDataFromForm = function() {
 	this.formData.version 	= 1;
-	this.formData.key 		= $("#auth-"+this.dialogId)[0].value;
-	this.formData.good 		= $("#good-"+this.dialogId)[0].value;
-	this.formData.bad 		= $("#bad-"+this.dialogId)[0].value;
+	this.formData.key 		= Dive.escapeForHTML($("#auth-"+this.dialogId)[0].value);
+	this.formData.good 		= Dive.escapeForHTML($("#good-"+this.dialogId)[0].value);
+	this.formData.bad 		= Dive.escapeForHTML($("#bad-"+this.dialogId)[0].value);
 };
 
 DiveGuiDialog.prototype.submit = function() {
@@ -602,7 +602,7 @@ DiveGuiViewModuleDialog.prototype.displayEvaluations = function(div, evaluations
 					+ '		<td>' + (data.contentsGrade ? data.contentsGrade : "") + '</td>'
 					+ '		<td>' + (data.timeContentRatio ? data.timeContentRatio : "") + '</td>'
 					+ '		<td>' + (data.good ? data.good : "") + '</td>'
-					+ '		<td>' + (data.bad ?data.bad : "") + '</td>'
+					+ '		<td>' + (data.bad ? data.bad : "") + '</td>'
 					
 					+ '	</tr>');
 			

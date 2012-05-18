@@ -67,8 +67,8 @@
 
 $(function () {
 	var module = {
-			name	: $.url().param(Dive.escapeForHTML('name')),
-			lecture	: $.url().param(Dive.escapeForHTML('lecture'))
+			name	: Dive.escapeForHTML($.url().param('name')),
+			lecture	: Dive.escapeForHTML($.url().param('lecture'))
 	};
 	
 	var diveGuiViewModuleDialog = new DiveGuiViewModuleDialog(module);
