@@ -567,7 +567,63 @@ DiveGuiViewModuleDialog.prototype.buildView = function() {
 	this.view.append(dialogHeader, dialogBody, dialogFooter);
 };
 
+DiveGuiViewModuleDialog.prototype.csvEscape = function(text) {
+	return text;
+}
 
+DiveGuiViewModuleDialog.prototype.toCSV = function(module, evaluations) {
+	
+	var csv = '"Module";"Lecture";"Contents Grade";"Contents Grade (Value)";"Time/Contents Ratio";"Time/Contents Ratio (Value)";"Comments: Good";"Comments: Bad"\n';
+	
+	for (var i = 0; i < evaluations.length; i++) {
+		var evaluation = evaluations[i];
+	
+		if(evaluation != null) {
+			var contentsGradeValue = evaluation.contentsGrade ? evaluation.contentsGrade : 0;
+			var contentsGradeText = valueToGradeText(contentsGradeValue).text;
+			
+			var timeContentRatioValue = evaluation.timeContentRatio ? evaluation.timeContentRatio : 0;
+			var timeContentRatioText = valueToContentRating(timeContentRatioValue).text;
+			
+			csv += '"'+this.csvEscape(module)+'";';
+			csv += '"'+this.csvEscape(evaluation.lecture)+'";';
+			csv += '"'+this.csvEscape(contentsGradeText)+'";';
+			csv += '"'+this.csvEscape(contentsGradeValue)+'";';
+			csv += '"'+this.csvEscape(timeContentRatioText)+'";';
+			csv += '"'+this.csvEscape(timeContentRatioValue)+'";';
+			csv += '"'+this.csvEscape(evaluation.good ? evaluation.good : "")+'";';
+			csv += '"'+this.csvEscape(evaluation.bad ? evaluation.bad : "")+'";';
+			csv += '\n';
+		}
+	}
+	
+	return csv;
+}
+
+
+DiveGuiViewModuleDialog.prototype.decrypt = function(evaluations, userKey) {
+	var decryptedEvaluations = new Array();
+	
+	for (var i = 0; i < evaluations.length; i++) {
+		var evaluation = evaluations[i];
+		var decrypted = null;
+
+		try {
+			decrypted = CryptoJS.AES.decrypt(evaluation.encryptedContent, userKey).toString(CryptoJS.enc.Utf8);
+			
+			if( decrypted != null && isJsonString(decrypted) )
+				decryptedEvaluations[i] = eval('(' + decrypted + ')');
+			
+			decryptedEvaluations[i].lecture = evaluation.lecture;
+				
+		} catch(err)
+		{
+			//nothing to do
+		}
+	}
+	
+	return decryptedEvaluations;
+}
 
 DiveGuiViewModuleDialog.prototype.displayEvaluations = function(div, evaluations, userKey) {
 	var table = 
@@ -590,30 +646,50 @@ DiveGuiViewModuleDialog.prototype.displayEvaluations = function(div, evaluations
 	
 	var tbody = $(table.find('tbody').first()[0]);
 	
-	for (var i = 0; i < evaluations.length; i++) {
-		var evaluation = evaluations[i];
-		var decrypted = CryptoJS.AES.decrypt(evaluation.encryptedContent, userKey).toString(CryptoJS.enc.Utf8);
+	var decryptedEvaluations = this.decrypt(evaluations, userKey);
+	
+	for (var i = 0; i < decryptedEvaluations.length; i++) {
+		var evaluation = decryptedEvaluations[i];
 		
 		var row = $('	<tr colspan="5">Unable to decrypt</tr>');
 		
-		if(isJsonString(decrypted)) {
-			
-			var data = eval('(' + decrypted + ')');
-			
+		if(evaluation != null) {
 			row = $('	<tr>'
-
 					+ '		<td>' + evaluation.lecture + '</td>'
-					+ '		<td>' + (data.contentsGrade ? data.contentsGrade : "") + '</td>'
-					+ '		<td>' + (data.timeContentRatio ? data.timeContentRatio : "") + '</td>'
-					+ '		<td>' + (data.good ? data.good : "") + '</td>'
-					+ '		<td>' + (data.bad ? data.bad : "") + '</td>'
-					
+					+ '		<td>' + (evaluation.contentsGrade ? evaluation.contentsGrade : "") + '</td>'
+					+ '		<td>' + (evaluation.timeContentRatio ? evaluation.timeContentRatio : "") + '</td>'
+					+ '		<td>' + (evaluation.good ? evaluation.good : "") + '</td>'
+					+ '		<td>' + (evaluation.bad ? evaluation.bad : "") + '</td>'
 					+ '	</tr>');
-			
 		}
-		
 		tbody.append(row);
 	}
+	
+	var downloadRow = $('<tr><td colspan="5"></td></tr>');
+	var downloadButton = $('<p>You must have Flash 10 installed to download this file.</p>');
+	downloadRow.find('td').first().append(downloadButton);
+	tbody.append(downloadRow);
+
+	var self = this;
+	downloadButton.downloadify(
+		{
+			filename: 	function(){ return "evaluations.csv" },
+			data: 		function(){ return self.toCSV(self.module.name, decryptedEvaluations);	},
+			
+			onComplete: 	function(){  },
+			onCancel: 		function(){  },
+			onError: 		function(){  },
+			
+			swf: diveBaseUrl + '/js/library/downloadify.swf',
+			downloadImage: diveBaseUrl + '/img/download.png',
+			width: 100,
+			height: 30,
+			transparent: true,
+			append: false
+		}
+	);	
+	
+	
 	
 };
 
