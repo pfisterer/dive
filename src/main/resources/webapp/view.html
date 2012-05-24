@@ -71,7 +71,13 @@ $(function () {
 			lecture	: Dive.escapeForHTML($.url().param('lecture'))
 	};
 	
-	var diveGuiViewModuleDialog = new DiveGuiViewModuleDialog(module);
+	var credentials = {
+			userkey	: Dive.escapeForHTML($.url().param('userkey')),
+			adminkey: Dive.escapeForHTML($.url().param('adminkey'))
+	};
+	
+	
+	var diveGuiViewModuleDialog = new DiveGuiViewModuleDialog(module, credentials);
 	diveGuiViewModuleDialog.show();
 });
 

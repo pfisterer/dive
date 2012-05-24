@@ -110,8 +110,6 @@ var DiveGuiDialog = function(module) {
 
 	this.module = module;
 	this.dialogId = CryptoJS.SHA1("DiveDialog" + this.module.name).toString();
-	
-//	this.view = $('<div id="DiveGui'+ this.dialogId+'" class="modal hide"></div>');
 	this.view = $('<div id="DiveGui'+ this.dialogId+'" class=""></div>');
 	
 	$(document.body).append(this.view);
@@ -349,7 +347,7 @@ DiveGuiDialog.prototype.buildView = function(module) {
 var DiveGuiCreateModuleDialog = function() {
 	this.id = CryptoJS.SHA1("DiveDialog" + Math.random()).toString();
 	
-	this.view = $('<div id="DiveGuiCreateModuleDialog'+ this.id+'" class="modal hide"></div>');
+	this.view = $('<div id="DiveGuiCreateModuleDialog'+ this.id+'" class="hide"></div>');
 	
 	$(document.body).append(this.view);
 
@@ -464,11 +462,12 @@ DiveGuiCreateModuleDialog.prototype.buildView = function() {
  */
 
 
-var DiveGuiViewModuleDialog = function(module) {
+var DiveGuiViewModuleDialog = function(module, credentials) {
 	this.id = CryptoJS.SHA1("DiveGuiViewModuleDialog" + Math.random()).toString();
-	this.view = $('<div id="DiveGuiViewModuleDialog'+ this.id+'" class="modal hide"></div>');
+	this.view = $('<div id="DiveGuiViewModuleDialog'+ this.id+'" class="hide"></div>');
 
 	this.module = module;
+	this.credentials = credentials;
 	this.okButton = null;
 	$(document.body).append(this.view);
 	var self = this;
@@ -526,6 +525,10 @@ DiveGuiViewModuleDialog.prototype.buildView = function() {
 	var loadButton 		= dialogBody.find('input.loadButton').first();
 	var evaluationDiv	= dialogBody.find('div.evaluationDiv').first();
 
+	adminKeyInput[0].value = this.credentials.adminkey;
+	userKeyInput[0].value = this.credentials.userkey;
+	
+	
 	var self = this;
 	loadButton.bind('click', this, function(e) {
 		var keyValue = adminKeyInput[0].value;
